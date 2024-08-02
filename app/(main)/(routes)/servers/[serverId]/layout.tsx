@@ -13,7 +13,7 @@ const ServerIdLayout = async ({
 }) => {
   const profile = await currentProfile();
   if (!profile) {
-    return redirectToSignIn();
+    return redirect("/sign-in");
   }
 
   const servers = await db.server.findMany({

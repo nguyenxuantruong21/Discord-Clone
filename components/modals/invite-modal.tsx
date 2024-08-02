@@ -1,6 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useState } from "react";
+import { Check, Copy, RefreshCcw } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -11,40 +14,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useModal } from "@/hooks/use-modal-store";
 import { useOrigin } from "@/hooks/use-origin";
-import axios from "axios";
-import { Check, Copy, RefreshCcw } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const InviteModal = () => {
+  const { onOpen, isOpen, onClose, type, data } = useModal();
+  const origin = useOrigin();
+
+  const isModalOpen = isOpen && type === "invite";
+  const { server } = data;
+
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { onOpen, isOpen, onClose, type, data } = useModal();
+  const inviteUrl = `${origin}/invite/${server?.inviteCode}`;
 
-  const origin = useOrigin();
-
-  const { server } = data;
-
-  const isModalOpen = isOpen && type === "invite";
-
-  const inviteURL = `${origin}/invite/${server?.inviteCode}`;
-
-  // handle copy
   const onCopy = () => {
-    navigator.clipboard.writeText(inviteURL);
+    navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
+
     setTimeout(() => {
       setCopied(false);
     }, 1000);
   };
 
-  // generate new link
   const onNew = async () => {
     try {
       setIsLoading(true);
       const response = await axios.patch(
         `/api/servers/${server?.id}/invite-code`
       );
+
       onOpen("invite", { server: response.data });
     } catch (error) {
       console.log(error);
@@ -73,7 +72,7 @@ const InviteModal = () => {
               disabled={isLoading}
               className="bg-zinc-300/5 border-0 focus-visible:ring-0
                text-black focus-visible:ring-offset-0 "
-              value={inviteURL}
+              value={inviteUrl}
             />
             <Button size={"icon"} onClick={onCopy} disabled={isLoading}>
               {copied ? (
