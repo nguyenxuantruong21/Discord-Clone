@@ -16,7 +16,7 @@ const ServerIdLayout = async ({
     return redirect("/sign-in");
   }
 
-  const servers = await db.server.findMany({
+  const servers = await db.server.findUnique({
     where: {
       id: params.serverId,
       members: {
@@ -33,7 +33,7 @@ const ServerIdLayout = async ({
 
   return (
     <div className="h-full">
-      <div className="md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
+      <div className="flex h-full w-60 z-20 flex-col fixed inset-y-0">
         <ServerSidebar serverId={params.serverId} />
       </div>
       <main className="h-full md:pl-60">{children}</main>
